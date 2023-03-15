@@ -1,38 +1,37 @@
-from icecream import ic
+import parsimonious
+from parsimonious.nodes import NodeVisitor
 
-from parsimonious.grammar import Grammar,NodeVisitor
+calculator_grammar = parsimonious.Grammar(
+    """
+    expression = number ws add_op ws number
+    number = ~r"\d+"
+    add_op = "+"
+    ws = ~r"\s*"
+"""
+)
 
-ic.configureOutput(includeContext=True)
 
-div_grammar = Grammar(r"""
-addition = number "+" number
-number = ~"[0-9]+"
-""")
-
-class AdditionVisitor(NodeVisitor):
-    # def visit_expr(self, node, visited_children):
-    #     ic(visited_children)
-    #     return int(visited_children[0])-int(visited_children[-1])
-
-    def visit_addition(self, node, visited_children):
-        ic(visited_children)
-        return int(visited_children[0])+int(visited_children[-1])
-
+class CalculatorVisitor(NodeVisitor):
     def visit_number(self, node, visited_children):
-        ic(visited_children)
-        ic(node)
+        return int(node.text)
+
+    def visit_add_op(self, node, visited_children):
         return node.text
 
-    # For the nodes that are not specified in the Visitor
-    def generic_visit(self, node, visited_children):
-        """ The generic visit method. """
-        return visited_children or node
+    def visit_expression(self, node, visited_children):
+        left, _, _, _, right = visited_children
+        return left + right
+
+    def visit_ws(self, node, visited_children):
+        pass
 
 
-tree = div_grammar.parse("1+2")
-# print(tree)
+def parse_calculator(expr):
+    tree = calculator_grammar.parse(expr)
+    visitor = CalculatorVisitor()
+    return visitor.visit(tree)
 
-dv = AdditionVisitor()
-output = dv.visit(tree)
-from pprint import pprint
-pprint(output)
+
+# Test the parser
+expression = "1+ 2"
+print(parse_calculator(expression))  # Output: 3
