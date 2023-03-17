@@ -7,9 +7,14 @@ grammar = parsimonious.Grammar(
     term = factor (mul_op factor)*
     factor = number / parenth_expr
     parenth_expr = "(" expression ")"
-    add_op = "+" / "-"
-    mul_op = "*" / "/"
+    add_op = add / sub
+    mul_op = mul / div
+    add = "+"
+    sub = "-"
+    mul = "*"
+    div = "/"
     number = ~r"\d+(\.\d+)?"
+    ws = ~r"\s*"
 """
 )
 

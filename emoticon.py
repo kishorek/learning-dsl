@@ -6,7 +6,7 @@ emoticon_grammar = parsimonious.Grammar(
     emoticon = smiley / frowny
     smiley = ":-)"
     frowny = ":-("
-"""
+    """
 )
 
 
